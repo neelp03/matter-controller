@@ -26,7 +26,7 @@ func main() {
 		fmt.Println("++++++++++ Device is already commissioned ++++++++++")
 	} else {
 		fmt.Println("========== Device not commissioned. Attempting to pair via BLE... ==========")
-		if err := services.PairDevice(ssid, password); err != nil {
+		if err := services.PairDeviceOverBLE(ssid, password); err != nil {
 			fmt.Println("!!!!!!!!!! Pairing failed !!!!!!!!!!:", err)
 			return
 		}
