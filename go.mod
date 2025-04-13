@@ -1,4 +1,4 @@
-module github.com/neelp03/matter-server-go
+module github.com/neelp03/matter-controller
 
 go 1.23.2
 
