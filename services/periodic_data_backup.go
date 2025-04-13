@@ -1,9 +1,10 @@
-package mattercontroller
+package services
 
 import (
 	"context"
 	"log"
 	"os"
+	"time"
 
 	firestore "cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
@@ -42,4 +43,37 @@ func backupDataToFirestore(client *firestore.Client, data map[string]interface{}
 		log.Fatalln("Error adding document: ", err)
 	}
 	log.Println("Data backed up successfully to Firestore")
+}
+
+// Launch go routine to backup data every x seconds
+func Interval_backup(seconds int) {
+	client := initFirebase()
+	defer client.Close()
+
+	indoor_temp, err := ReadTemperature()
+	if err != nil {
+		log.Fatalln("Error reading indoor temperature: ", err)
+	}
+	outdoor_temp, err := FetchOutdoorTemperature()
+	if err != nil {
+		log.Fatalln("Error fetching outdoor weather: ", err)
+	}
+
+	// Example data to backup
+	data := map[string]interface{}{
+		"indoor-temp":  indoor_temp,
+		"outdoor-temp": outdoor_temp,
+		// "humidity":    60,
+		"time": time.Now(),
+	}
+
+	ticker := time.NewTicker(time.Duration(seconds) * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			backupDataToFirestore(client, data)
+		}
+	}
 }

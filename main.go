@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+	"github.com/neelp03/matter-controller/handlers"
+	"github.com/neelp03/matter-controller/services"
 )
 
 func isDeviceCommissioned() bool {
@@ -74,6 +76,12 @@ func main() {
 		fmt.Println("++++++++++ Pairing succeeded ++++++++++")
 	}
 
+	// Start periodic data backup
+	backupInterval := 60 // seconds
+	go services.Interval_backup(backupInterval)
+	fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
+
+	// Start HTTP server
 	http.HandleFunc("/temperature", handlers.TemperatureHandler)
 	http.HandleFunc("/weather", handlers.WeatherHandler)
 
