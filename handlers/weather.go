@@ -15,6 +15,7 @@ func WeatherHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := fmt.Sprintf("Outdoor Temp: %.2f°C, Rain: %.2fmm", weather.Current.Temperature, weather.Current.Rain)
+
 	fmt.Println("========== Responding with weather ==========")
 	fmt.Println(response)
 	w.Write([]byte(response))

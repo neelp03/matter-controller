@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"github.com/neelp03/matter-controller/utils"
 )
 
 func IsDeviceCommissioned() bool {
@@ -39,7 +40,7 @@ func PairDeviceOverBLE(ssid, password string) error {
 	return nil
 }
 
-func ReadTemperatureCelsius() (float64, error) {
+func ReadTemperature() (float64, error) {
 	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "temperaturemeasurement", "read", "measured-value", "1", "1")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -57,5 +58,9 @@ func ReadTemperatureCelsius() (float64, error) {
 		return 0, fmt.Errorf("!!!!!!!!!! invalid temperature format !!!!!!!!!!: %v", err)
 	}
 
-	return float64(tempRaw) / 100.0, nil
+	celsius := float64(tempRaw) / 100.0
+	fahrenheit := utils.CToF(celsius)
+
+	return fahrenheit, nil
 }
+

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"github.com/neelp03/matter-controller/utils"
 )
 
 type WeatherResponse struct {
@@ -26,6 +27,22 @@ func FetchOutdoorWeather() (*WeatherResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("!!!!!!!!!! failed to decode Open-Meteo response !!!!!!!!!!: %v", err)
 	}
-
 	return &weather, nil
+}
+
+func FetchOutdoorTemperature() (float64, error) {
+	weather, err := FetchOutdoorWeather()
+	if err != nil {
+		return 0, err
+	}
+	tempF := utils.CToF(weather.Current.Temperature)
+	return tempF, nil
+}
+
+func FetchOutdoorRain() (float64, error) {
+	weather, err := FetchOutdoorWeather()
+	if err != nil {
+		return 0, err
+	}
+	return weather.Current.Rain, nil
 }
