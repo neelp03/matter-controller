@@ -17,7 +17,7 @@ func WindowStatusHandler(w http.ResponseWriter, r *http.Request) {
 func ToggleWindowHandler(w http.ResponseWriter, r *http.Request) {
 	services.WindowMu.Lock()
 	services.WindowOpen = !services.WindowOpen
-	services.WindowEventFlag = true
+	services.WindowEventFlag = !services.WindowEventFlag
 	status := "closed"
 	if services.WindowOpen {
 		status = "open"
