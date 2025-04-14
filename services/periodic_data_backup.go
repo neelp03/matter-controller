@@ -9,7 +9,6 @@ import (
 	firestore "cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/joho/godotenv"
-	"github.com/neelp03/matter-controller/handlers"
 	"github.com/neelp03/matter-controller/utils"
 	"google.golang.org/api/option"
 )
@@ -59,7 +58,7 @@ func compileData() (map[string]interface{}, []error) {
 		log.Println("Error fetching outdoor weather: ", err)
 		errors = append(errors, err)
 	}
-	window_open, is_window_event := handlers.GetWindowStatus()
+	window_open, is_window_event := GetWindowStatus()
 	if err != nil {
 		log.Println("Error checking window status: ", err)
 		errors = append(errors, err)

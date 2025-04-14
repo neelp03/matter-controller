@@ -6,12 +6,12 @@ var WindowOpen = false
 var WindowEventFlag = false
 var WindowMu sync.Mutex
 
-func GetWindowStatus() (boolean, boolean) {
-	windowMu.Lock()
-	defer windowMu.Unlock()
-	if windowEventFlag {
-		windowEventFlag = false
-		return windowOpen, true
+func GetWindowStatus() (bool, bool) {
+	WindowMu.Lock()
+	defer WindowMu.Unlock()
+	if WindowEventFlag {
+		WindowEventFlag = false
+		return WindowOpen, true
 	}
-	return windowOpen, false
+	return WindowOpen, false
 }
