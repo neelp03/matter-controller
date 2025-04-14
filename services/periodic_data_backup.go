@@ -63,18 +63,13 @@ func compileData() (map[string]interface{}, error[]) {
 		errors = append(errors, err)
 	}
 
-	// Convert time to minuets since Jan 1
-	time_now := time.Now()
-	// Round down to the nearest minute
-	time_now = time.Date(time_now.Year(), time_now.Month(), time_now.Day(), time_now.Hour(), time_now.Minute(), 0, 0, time.UTC)
-	time_diff := time_now.Sub(time.Date(time_now.Year(), 1, 1, 0, 0, 0, 0, time.UTC))
-	minutes_of_year := int(time_diff.Minutes())
+	time := TimeToMinutesSinceYearStart(time.Now())
 
 	data := map[string]interface{}{
 		"indoor-temp":  indoor_temp,
 		"outdoor-temp": outdoor_temp,
 		// "humidity":    60,
-		"time":         minutes_of_year,
+		"time":         time,
 		"window-open":  window_open,
 		"window-event": is_window_event,
 	}
