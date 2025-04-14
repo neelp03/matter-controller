@@ -40,7 +40,7 @@ func backupDataToFirestore(client *firestore.Client, data map[string]interface{}
 	ctx := context.Background()
 	_, _, err := client.Collection("periodic_data").Add(ctx, data)
 	if err != nil {
-		log.Fatalln("Error adding document: ", err)
+		log.Println("Error adding document: ", err)
 	}
 	log.Println("Data backed up successfully to Firestore")
 }
