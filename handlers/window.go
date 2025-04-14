@@ -8,15 +8,17 @@ import (
 )
 
 var windowOpen = false
+var windowEventFlag = false
 var windowMu sync.Mutex
 
-func GetWindowStatus() string {
+func GetWindowStatus() (boolean, boolean) {
 	windowMu.Lock()
 	defer windowMu.Unlock()
-	if windowOpen {
-		return "open"
+	if windowEventFlag {
+		windowEventFlag = false
+		return windowOpen, true
 	}
-	return "closed"
+	return windowOpen, false
 }
 
 func WindowStatusHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,6 +30,7 @@ func WindowStatusHandler(w http.ResponseWriter, r *http.Request) {
 func ToggleWindowHandler(w http.ResponseWriter, r *http.Request) {
 	windowMu.Lock()
 	windowOpen = !windowOpen
+	windowEventFlag = true
 	status := "closed"
 	if windowOpen {
 		status = "open"

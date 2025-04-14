@@ -9,6 +9,8 @@ import (
 	firestore "cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"github.com/joho/godotenv"
+	"github.com/neelp03/matter-controller/handlers"
+	"github.com/neelp03/matter-controller/utils"
 	"google.golang.org/api/option"
 )
 
@@ -45,7 +47,7 @@ func backupDataToFirestore(client *firestore.Client, data map[string]interface{}
 	log.Println("Data backed up successfully to Firestore")
 }
 
-func compileData() (map[string]interface{}, error[]) {
+func compileData() (map[string]interface{}, []error) {
 	indoor_temp, err := ReadTemperature()
 	errors := make([]error, 0)
 	if err != nil {
@@ -57,13 +59,13 @@ func compileData() (map[string]interface{}, error[]) {
 		log.Println("Error fetching outdoor weather: ", err)
 		errors = append(errors, err)
 	}
-	window_open, is_window_event, err := IsWindowOpen()
+	window_open, is_window_event := handlers.GetWindowStatus()
 	if err != nil {
 		log.Println("Error checking window status: ", err)
 		errors = append(errors, err)
 	}
 
-	time := TimeToMinutesSinceYearStart(time.Now())
+	time := utils.TimeToMinutesSinceYearStart(time.Now())
 
 	data := map[string]interface{}{
 		"indoor-temp":  indoor_temp,
