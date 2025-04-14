@@ -2,11 +2,11 @@ package services
 
 import (
 	"fmt"
+	"github.com/neelp03/matter-controller/utils"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
-	"github.com/neelp03/matter-controller/utils"
 )
 
 func IsDeviceCommissioned() bool {
@@ -63,4 +63,3 @@ func ReadTemperature() (float64, error) {
 
 	return fahrenheit, nil
 }
-

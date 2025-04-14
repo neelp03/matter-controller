@@ -4,38 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sync"
+
+	"github.com/neelp03/matter-controller/services"
 )
 
-var windowOpen = false
-var windowEventFlag = false
-var windowMu sync.Mutex
-
-func GetWindowStatus() (boolean, boolean) {
-	windowMu.Lock()
-	defer windowMu.Unlock()
-	if windowEventFlag {
-		windowEventFlag = false
-		return windowOpen, true
-	}
-	return windowOpen, false
-}
-
 func WindowStatusHandler(w http.ResponseWriter, r *http.Request) {
-	status := GetWindowStatus()
-	response := map[string]string{"window": status}
+	status, _ := services.GetWindowStatus()
+	response := map[string]bool{"window": status}
 	json.NewEncoder(w).Encode(response)
 }
 
 func ToggleWindowHandler(w http.ResponseWriter, r *http.Request) {
-	windowMu.Lock()
-	windowOpen = !windowOpen
-	windowEventFlag = true
+	services.WindowMu.Lock()
+	services.WindowOpen = !services.WindowOpen
+	services.WindowEventFlag = !services.WindowEventFlag
 	status := "closed"
-	if windowOpen {
+	if services.WindowOpen {
 		status = "open"
 	}
-	windowMu.Unlock()
+	services.WindowMu.Unlock()
 	fmt.Println("========== Toggled window. Now:", status, "==========")
 	response := map[string]string{"window": status}
 	json.NewEncoder(w).Encode(response)
