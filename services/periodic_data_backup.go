@@ -39,10 +39,25 @@ func initFirebase() *firestore.Client {
 
 func backupDataToFirestore(client *firestore.Client, data map[string]interface{}) {
 	ctx := context.Background()
+
+	//		Log the data to a history for ML training
 	_, _, err := client.Collection("periodic_data").Add(ctx, data)
 	if err != nil {
 		log.Println("Error adding document: ", err)
 	}
+
+	//		Update the current data
+	// Get subset of data (indoor temp, outdoor temp, window status)
+	data_subset := map[string]interface{}{
+		"indoor-temp":  data["indoor_temp"],
+		"outdoor-temp": data["outdoor_temp"],
+		"window-open":  data["window_open"],
+	}
+	_, err = client.Collection("current_data").Doc("latest").Set(ctx, data_subset)
+	if err != nil {
+		log.Println("Error updating document: ", err)
+	}
+
 	log.Println("Data backed up successfully to Firestore")
 }
 
@@ -70,7 +85,10 @@ func compileData() (map[string]interface{}, []error) {
 		"indoor-temp":  indoor_temp,
 		"outdoor-temp": outdoor_temp,
 		// "humidity":    60,
-		"time":         time,
+		"time": time,
+		// "longitude":  0,
+		// "latitude":   0,
+		// "weather":    "sunny",
 		"window-open":  window_open,
 		"window-event": is_window_event,
 	}
