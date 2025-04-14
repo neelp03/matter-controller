@@ -15,7 +15,7 @@ type WeatherResponse struct {
 }
 
 func FetchOutdoorWeather() (*WeatherResponse, error) {
-	url := "https://api.open-meteo.com/v1/forecast?latitude=37.7749&longitude=-122.4194&current=temperature_2m,rain"
+	url := "https://api.open-meteo.com/v1/forecast?latitude=37.3387&longitude=-121.8853&current=temperature_2m,rain"
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("!!!!!!!!!! failed to call Open-Meteo API !!!!!!!!!!: %v", err)
