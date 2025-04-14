@@ -49,9 +49,9 @@ func backupDataToFirestore(client *firestore.Client, data map[string]interface{}
 	//		Update the current data
 	// Get subset of data (indoor temp, outdoor temp, window status)
 	data_subset := map[string]interface{}{
-		"indoor-temp":  data["indoor_temp"],
-		"outdoor-temp": data["outdoor_temp"],
-		"window-open":  data["window_open"],
+		"indoor-temp":  data["indoor-temp"],
+		"outdoor-temp": data["outdoor-temp"],
+		"window-open":  data["window-open"],
 	}
 	_, err = client.Collection("current_data").Doc("latest").Set(ctx, data_subset)
 	if err != nil {
