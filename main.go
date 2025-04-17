@@ -38,6 +38,10 @@ func main() {
 	go services.Interval_backup(backupInterval)
 	fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
 
+	// Launch the rule‑based controller
+	go evaluateRules()
+	fmt.Println("========== Rule‑based climate control loop started ==========")
+	
 	http.HandleFunc("/temperature", handlers.TemperatureHandler)
 	http.HandleFunc("/weather", handlers.WeatherHandler)
 	http.HandleFunc("/window", handlers.WindowStatusHandler)
