@@ -26,6 +26,16 @@ func GetWindowStatus() (bool, bool) {
 	return WindowOpen, false
 }
 
+func UpdateWindowStatus() {
+	WindowMu.Lock()
+	WindowOpen = !WindowOpen
+	WindowEventFlag = !WindowEventFlag
+	status := "closed"
+	if WindowOpen {
+		status = "open"
+	}
+	WindowMu.Unlock()
+}
 // evaluateRules is the rule‑based controller responsible for deciding when
 // to open or close the window.  
 //
@@ -99,4 +109,18 @@ func evaluateRules() {
 
 			time.Sleep(tick)
 	}
+}
+
+func OpenWindow() error {
+	// Simulate opening the window
+	fmt.Println("Opening window...")
+	// UpdateWindowStatus()
+	return nil
+}
+
+func CloseWindow() error {
+	// Simulate closing the window
+	fmt.Println("Closing window...")
+	// UpdateWindowStatus()
+	return nil
 }
