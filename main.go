@@ -33,8 +33,16 @@ func main() {
 		fmt.Println("++++++++++ Pairing succeeded ++++++++++")
 	}
 
+	// Start periodic data backup
+	backupInterval := 60 // seconds
+	go services.Interval_backup(backupInterval)
+	fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
+
 	http.HandleFunc("/temperature", handlers.TemperatureHandler)
 	http.HandleFunc("/weather", handlers.WeatherHandler)
+	http.HandleFunc("/window", handlers.WindowStatusHandler)
+	http.HandleFunc("/toggle-window", handlers.ToggleWindowHandler)
+
 
 	fmt.Println("========== Server is now listening on port 8080 ==========")
 	err := http.ListenAndServe("0.0.0.0:8080", nil)
