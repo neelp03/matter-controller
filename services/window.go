@@ -1,17 +1,52 @@
 package services
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 var WindowOpen = false
 var WindowEventFlag = false
 var WindowMu sync.Mutex
 
-func GetWindowStatus() (bool, bool) {
+func OpenWindow() error {
 	WindowMu.Lock()
 	defer WindowMu.Unlock()
-	if WindowEventFlag {
-		WindowEventFlag = false
-		return WindowOpen, true
+
+	if WindowOpen {
+		fmt.Println("Window is already open")
+		return nil
 	}
-	return WindowOpen, false
+
+	// Simulate opening the window
+	fmt.Println("Opening window...")
+	var err error // may return an error
+
+	if err == nil {
+		WindowOpen = true
+		WindowEventFlag = !WindowEventFlag
+	}
+
+	return err
+}
+
+func CloseWindow() error {
+	WindowMu.Lock()
+	defer WindowMu.Unlock()
+
+	if !WindowOpen {
+		fmt.Println("Window is already closed")
+		return nil
+	}
+
+	// Simulate closing the window
+	fmt.Println("Closing window...")
+	var err error // may return an error
+
+	if err == nil {
+		WindowOpen = false
+		WindowEventFlag = !WindowEventFlag
+	}
+
+	return nil
 }

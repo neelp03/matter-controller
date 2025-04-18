@@ -38,11 +38,16 @@ func main() {
 	go services.Interval_backup(backupInterval)
 	fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
 
+	// ***************************
+	// Launch the rule‑based controller
+	// go services.RunAutomatedController()
+	// fmt.Println("========== Rule‑based climate control loop started ==========")
+	// ***************************
+
 	http.HandleFunc("/temperature", handlers.TemperatureHandler)
 	http.HandleFunc("/weather", handlers.WeatherHandler)
 	http.HandleFunc("/window", handlers.WindowStatusHandler)
 	http.HandleFunc("/toggle-window", handlers.ToggleWindowHandler)
-
 
 	fmt.Println("========== Server is now listening on port 8080 ==========")
 	err := http.ListenAndServe("0.0.0.0:8080", nil)
