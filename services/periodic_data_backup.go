@@ -56,9 +56,12 @@ func backupDataToFirestore(client *firestore.Client, data map[string]interface{}
 	_, err = client.Collection("current_data").Doc("latest").Set(ctx, data_subset)
 	if err != nil {
 		log.Println("Error updating document: ", err)
+		return
 	}
 
 	log.Println("Data backed up successfully to Firestore")
+	// unset window event flag
+	WindowEventFlag = false
 }
 
 func compileData() (map[string]interface{}, []error) {
@@ -73,11 +76,6 @@ func compileData() (map[string]interface{}, []error) {
 		log.Println("Error fetching outdoor weather: ", err)
 		errors = append(errors, err)
 	}
-	window_open, is_window_event := GetWindowStatus()
-	if err != nil {
-		log.Println("Error checking window status: ", err)
-		errors = append(errors, err)
-	}
 
 	time := utils.TimeToMinutesSinceYearStart(time.Now())
 
@@ -89,8 +87,8 @@ func compileData() (map[string]interface{}, []error) {
 		// "longitude":  0,
 		// "latitude":   0,
 		// "weather":    "sunny",
-		"window-open":  window_open,
-		"window-event": is_window_event,
+		"window-open":  WindowOpen,
+		"window-event": WindowEventFlag,
 	}
 
 	return data, errors
