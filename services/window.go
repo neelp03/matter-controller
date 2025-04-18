@@ -18,7 +18,7 @@ func OpenWindow() error {
 		return nil
 	}
 
-	// Simulate opening the window
+	OpenWindowMotor();
 	fmt.Println("Opening window...")
 	var err error // may return an error
 
@@ -39,7 +39,7 @@ func CloseWindow() error {
 		return nil
 	}
 
-	// Simulate closing the window
+	CloseWindowMotor();
 	fmt.Println("Closing window...")
 	var err error // may return an error
 

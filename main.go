@@ -22,27 +22,37 @@ func main() {
 		return
 	}
 
-	if services.IsDeviceCommissioned() {
-		fmt.Println("++++++++++ Device is already commissioned ++++++++++")
+	// Check and pair Temperature Sensor (endpoint 1)
+	if services.IsDeviceCommissioned(1) {
+		fmt.Println("++++++++++ Temperature sensor is already commissioned ++++++++++")
 	} else {
-		fmt.Println("========== Device not commissioned. Attempting to pair via BLE... ==========")
-		if err := services.PairDeviceOverBLE(ssid, password); err != nil {
-			fmt.Println("!!!!!!!!!! Pairing failed !!!!!!!!!!:", err)
+		if err := services.PairDeviceOverBLE(1, ssid, password); err != nil {
+			fmt.Println("!!!!!!!!!! Failed to pair temperature sensor !!!!!!!!!!:", err)
 			return
 		}
-		fmt.Println("++++++++++ Pairing succeeded ++++++++++")
+		fmt.Println("++++++++++ Paired temperature sensor ++++++++++")
 	}
 
-	// Start periodic data backup
-	backupInterval := 60 // seconds
-	go services.Interval_backup(backupInterval)
-	fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
+	// Check and pair Window Motor (endpoint 2)
+	if services.IsDeviceCommissioned(2) {
+		fmt.Println("++++++++++ Window motor is already commissioned ++++++++++")
+	} else {
+		if err := services.PairDeviceOverBLE(2, ssid, password); err != nil {
+			fmt.Println("!!!!!!!!!! Failed to pair window motor !!!!!!!!!!:", err)
+			return
+		}
+		fmt.Println("++++++++++ Paired window motor ++++++++++")
+	}
 
-	// ***************************
+	// // Start periodic data backup
+	// backupInterval := 60 // seconds
+	// go services.Interval_backup(backupInterval)
+	// fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
+
+
 	// Launch the rule‑based controller
-	// go services.RunAutomatedController()
-	// fmt.Println("========== Rule‑based climate control loop started ==========")
-	// ***************************
+	go services.RunAutomatedController()
+	fmt.Println("========== Rule‑based climate control loop started ==========")
 
 	http.HandleFunc("/temperature", handlers.TemperatureHandler)
 	http.HandleFunc("/weather", handlers.WeatherHandler)
