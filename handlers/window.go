@@ -9,15 +9,21 @@ import (
 )
 
 func WindowStatusHandler(w http.ResponseWriter, r *http.Request) {
-	status, _ := services.GetWindowStatus()
-	response := map[string]bool{"window": status}
+	response := map[string]bool{"window": services.WindowOpen}
 	json.NewEncoder(w).Encode(response)
 }
 
 func ToggleWindowHandler(w http.ResponseWriter, r *http.Request) {
-	services.UpdateWindowStatus()
-	status, _ := services.GetWindowStatus()
-	fmt.Println("========== Toggled window. Now:", status, "==========")
-	response := map[string]string{"window": status}
+	if services.WindowOpen {
+		services.CloseWindow()
+	} else {
+		services.OpenWindow()
+	}
+	statusStr := "closed"
+	if services.WindowOpen {
+		statusStr = "open"
+	}
+	fmt.Println("========== Toggled window. Now:", statusStr, "==========")
+	response := map[string]string{"window": statusStr}
 	json.NewEncoder(w).Encode(response)
 }
