@@ -40,15 +40,14 @@ func main() {
 
 	// ***************************
 	// Launch the rule‑based controller
-	// go evaluateRules()
+	// go services.RunAutomatedController()
 	// fmt.Println("========== Rule‑based climate control loop started ==========")
 	// ***************************
-	
+
 	http.HandleFunc("/temperature", handlers.TemperatureHandler)
 	http.HandleFunc("/weather", handlers.WeatherHandler)
 	http.HandleFunc("/window", handlers.WindowStatusHandler)
 	http.HandleFunc("/toggle-window", handlers.ToggleWindowHandler)
-
 
 	fmt.Println("========== Server is now listening on port 8080 ==========")
 	err := http.ListenAndServe("0.0.0.0:8080", nil)

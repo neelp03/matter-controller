@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/neelp03/matter-controller/services"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestEvaluateRules(t *testing.T) {
@@ -60,25 +59,25 @@ func TestEvaluateRules(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			services.ReadTemperature = func() (float64, error) {
+			ReadTemperature = func() (float64, error) {
 				return tt.indoorTemp, nil
 			}
-			services.FetchOutdoorTemperature = func() (float64, error) {
+			FetchOutdoorTemperature = func() (float64, error) {
 				return tt.outdoorTemp, nil
 			}
-			services.FetchOutdoorRain = func() (float64, error) {
+			FetchOutdoorRain = func() (float64, error) {
 				return tt.rainRate, nil
 			}
-			services.FetchOutdoorAQI = func() (float64, error) {
+			FetchOutdoorAQI = func() (float64, error) {
 				return tt.aqi, nil
 			}
-			services.OpenWindow = func() error {
+			OpenWindow = func() error {
 				services.WindowMu.Lock()
 				defer services.WindowMu.Unlock()
 				services.WindowOpen = true
 				return nil
 			}
-			services.CloseWindow = func() error {
+			CloseWindow = func() error {
 				services.WindowMu.Lock()
 				defer services.WindowMu.Unlock()
 				services.WindowOpen = false
