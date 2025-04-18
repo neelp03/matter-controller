@@ -61,32 +61,20 @@ Decision logic:
 
   - If triggerEvent is false, shouldOpen is ignored.
 */
-func ruleBasedControllerEval() (bool, bool) {
-	indoor, errIn := ReadTemperature()
-	if errIn != nil {
-		fmt.Println("Error reading indoor temperature:", errIn)
-		return false, false
-	}
-
+func ruleBasedControllerEval(indoor float64, outdoor float64) (bool, bool) {
 	comfortNeeds := indoor < (targetComfort-deltaThreshold) || indoor > (targetComfort+deltaThreshold)
 	if !comfortNeeds {
 		return false, false
 	}
 
-	outdoor, errOut := FetchOutdoorTemperature()
-	if errOut != nil {
-		fmt.Println("Error fetching outdoor temperature:", errOut)
-		return false, false
-	}
-
 	if (indoor < (targetComfort-deltaThreshold) && outdoor > indoor) || (indoor > (targetComfort+deltaThreshold) && outdoor < indoor) {
-		return true, true
+		return !WindowOpen, true
 	} else {
-		return true, false
+		return WindowOpen, false
 	}
 }
 
-func modelBasedControllerEval() (bool, bool) { return false, false }
+func modelBasedControllerEval(indoor float64, outdoor float64) (bool, bool) { return false, false }
 
 /*
 Once a minute will check if the window can be open.
@@ -94,6 +82,8 @@ If it can't and the window is open, close it.
 If it can the system will evaluate if a window event should be triggered.
 */
 func automatedControllerEval() {
+	WindowMu.Lock()
+	defer WindowMu.Unlock()
 	// Check if the window can be open
 	canBeOpen := canWindowBeOpen()
 
@@ -109,9 +99,11 @@ func automatedControllerEval() {
 		return
 	}
 
+	indoor, outdoor := getTemps()
+
 	// Evaluate if a window event should be triggered
 	// modelBasedControllerEval()
-	trigger, shouldOpen := ruleBasedControllerEval()
+	trigger, shouldOpen := ruleBasedControllerEval(indoor, outdoor)
 
 	if !trigger {
 		return
@@ -145,4 +137,21 @@ func RunAutomatedController() {
 			automatedControllerEval()
 		}
 	}
+}
+
+// Planned for deprecation. Migrate to a new shared temperature data service.
+func getTemps() (float64, float64) {
+	indoorTemp, err := ReadTemperature()
+	if err != nil {
+		fmt.Println("Error reading indoor temperature:", err)
+		return 0, 0
+	}
+
+	outdoorTemp, err := FetchOutdoorTemperature()
+	if err != nil {
+		fmt.Println("Error fetching outdoor temperature:", err)
+		return 0, 0
+	}
+
+	return indoorTemp, outdoorTemp
 }
