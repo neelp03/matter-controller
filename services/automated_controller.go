@@ -1,7 +1,10 @@
 package services
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"os/exec"
 	"time"
 )
 
@@ -76,11 +79,11 @@ func ruleBasedControllerEval(indoor float64, outdoor float64) (bool, bool) {
 
 func modelBasedControllerEval(indoor float64, outdoor float64) (bool, bool) {
 	data := map[string]interface{}{
-		"indoor_temp": indoor,
+		"indoor_temp":  indoor,
 		"outdoor_temp": outdoor,
-		"time": float64(time.Now().Hour()*3600 + time.Now().Minute()*60 + time.Now().Second()),
+		"time":         float64(time.Now().Hour()*3600 + time.Now().Minute()*60 + time.Now().Second()),
 	}
-	
+
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		fmt.Println("Error marshalling JSON:", err)
