@@ -34,25 +34,25 @@ func main() {
 	}
 
 	// Check and pair Window Motor (endpoint 2)
-	if services.IsDeviceCommissioned(2) {
+	if services.IsDeviceCommissioned(3) {
 		fmt.Println("++++++++++ Window motor is already commissioned ++++++++++")
 	} else {
-		if err := services.PairDeviceOverBLE(2, ssid, password); err != nil {
+		if err := services.PairDeviceOverBLE(3, ssid, password); err != nil {
 			fmt.Println("!!!!!!!!!! Failed to pair window motor !!!!!!!!!!:", err)
 			return
 		}
 		fmt.Println("++++++++++ Paired window motor ++++++++++")
 	}
 
-	// // Start periodic data backup
-	// backupInterval := 60 // seconds
-	// go services.Interval_backup(backupInterval)
-	// fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
+	// Start periodic data backup
+	backupInterval := 60 // seconds
+	go services.Interval_backup(backupInterval)
+	fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
 
 
-	// Launch the rule‑based controller
-	go services.RunAutomatedController()
-	fmt.Println("========== Rule‑based climate control loop started ==========")
+	// // Launch the rule‑based controller
+	// go services.RunAutomatedController()
+	// fmt.Println("========== Rule‑based climate control loop started ==========")
 
 	http.HandleFunc("/temperature", handlers.TemperatureHandler)
 	http.HandleFunc("/weather", handlers.WeatherHandler)

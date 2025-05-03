@@ -66,7 +66,7 @@ func ReadTemperature() (float64, error) {
 
 func OpenWindowMotor() error {
 	fmt.Println("========== Sending Matter command: OPEN window motor ==========")
-	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "onoff", "on", "2", "1")
+	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "onoff", "on", "3", "1")
 	cmdOut, err := cmd.CombinedOutput()
 	fmt.Println(string(cmdOut))
 	if err != nil {
@@ -77,7 +77,7 @@ func OpenWindowMotor() error {
 
 func CloseWindowMotor() error {
 	fmt.Println("========== Sending Matter command: CLOSE window motor ==========")
-	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "onoff", "off", "2", "1")
+	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "onoff", "off", "3", "1")
 	cmdOut, err := cmd.CombinedOutput()
 	fmt.Println(string(cmdOut))
 	if err != nil {
