@@ -95,7 +95,7 @@ func compileData() (map[string]interface{}, []error) {
 }
 
 // Launch go routine to backup data every x seconds
-func Interval_backup(client *firestore.Client, seconds int) {
+func intervalBackup(client *firestore.Client, seconds int) {
 
 	ticker := time.NewTicker(time.Duration(seconds) * time.Second)
 	defer ticker.Stop()
@@ -115,7 +115,7 @@ func Interval_backup(client *firestore.Client, seconds int) {
 	}
 }
 
-func ListenForWindowRequests(client *firestore.Client) {
+func listenForWindowRequests(client *firestore.Client) {
 	ctx := context.Background()
 	collection := client.Collection("window_requests")
 
@@ -165,8 +165,8 @@ func StartDBServices(seconds int) {
 	defer client.Close()
 
 	// Start the interval backup in a goroutine
-	go Interval_backup(client, seconds)
+	go intervalBackup(client, seconds)
 
 	// Start listening for window requests
-	ListenForWindowRequests(client)
+	listenForWindowRequests(client)
 }

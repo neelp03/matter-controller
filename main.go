@@ -46,9 +46,8 @@ func main() {
 
 	// Start periodic data backup
 	backupInterval := 60 // seconds
-	go services.Interval_backup(backupInterval)
+	go services.StartDBServices(backupInterval)
 	fmt.Println("========== Periodic data backup started every", backupInterval, "seconds ==========")
-
 
 	// // Launch the rule‑based controller
 	// go services.RunAutomatedController()
