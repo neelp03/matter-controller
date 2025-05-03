@@ -1,7 +1,10 @@
 package services
 
 import (
+	"bytes"
 	"fmt"
+	"os/exec"
+	"strconv"
 	"time"
 )
 
@@ -74,37 +77,32 @@ func ruleBasedControllerEval(indoor float64, outdoor float64) (bool, bool) {
 	}
 }
 
-func modelBasedControllerEval(indoor float64, outdoor float64) (bool, bool) {
-	data := map[string]interface{}{
-		"indoor_temp": indoor,
-		"outdoor_temp": outdoor,
-		"time": float64(time.Now().Hour()*3600 + time.Now().Minute()*60 + time.Now().Second()),
-	}
-	
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		fmt.Println("Error marshalling JSON:", err)
-		return false, false
+func ModelBasedControllerEval(indoor float64, outdoor float64) (bool, bool) {
+	seconds := time.Now().Hour()*3600 + time.Now().Minute()*60 + time.Now().Second()
+	args := []string{
+		"inference.py",
+		fmt.Sprintf("%.2f", indoor),
+		fmt.Sprintf("%.2f", outdoor),
+		strconv.Itoa(seconds),
+		strconv.FormatBool(WindowOpen),
 	}
 
-	cmd := exec.Command("python3", "~/ml_model/main.py")
-	cmd.Stdin = bytes.NewBuffer(jsonData)
+	cmd := exec.Command("python3", args...)
+	cmd.Dir = "ml_model"
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("Error running model inference:", err)
+		fmt.Println("Output:", string(output))
 		return false, false
 	}
 
 	result := string(bytes.TrimSpace(output))
-	switch result {
-	case "open":
-		return true, true
-	case "close":
-		return true, false
-	default:
-		return false, false
+	if result == "True" {
+		return true, !WindowOpen
 	}
+	return false, false
 }
+
 
 /*
 Once a minute will check if the window can be open.
@@ -133,7 +131,7 @@ func automatedControllerEval() {
 
 	// Evaluate if a window event should be triggered
 	// modelBasedControllerEval()
-	trigger, shouldOpen := modelBasedControllerEval(indoor, outdoor)
+	trigger, shouldOpen := ModelBasedControllerEval(indoor, outdoor)
 
 	if !trigger {
 		return
