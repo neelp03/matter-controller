@@ -18,13 +18,14 @@ func OpenWindow() error {
 		return nil
 	}
 
-	OpenWindowMotor();
+	err := OpenWindowMotor()
 	fmt.Println("Opening window...")
-	var err error // may return an error
 
 	if err == nil {
 		WindowOpen = true
 		WindowEventFlag = !WindowEventFlag
+	} else {
+		fmt.Println(fmt.Errorf("error opening window: %v", err))
 	}
 
 	return err
@@ -39,13 +40,14 @@ func CloseWindow() error {
 		return nil
 	}
 
-	CloseWindowMotor();
-	fmt.Println("Closing window...")
-	var err error // may return an error
+	err := CloseWindowMotor()
 
 	if err == nil {
+		fmt.Println("Closing window...")
 		WindowOpen = false
 		WindowEventFlag = !WindowEventFlag
+	} else {
+		fmt.Println(fmt.Errorf("error closing window: %v", err))
 	}
 
 	return nil
