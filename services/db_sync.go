@@ -95,9 +95,7 @@ func compileData() (map[string]interface{}, []error) {
 }
 
 // Launch go routine to backup data every x seconds
-func Interval_backup(seconds int) {
-	client := initFirebase()
-	defer client.Close()
+func intervalBackup(client *firestore.Client, seconds int) {
 
 	ticker := time.NewTicker(time.Duration(seconds) * time.Second)
 	defer ticker.Stop()
@@ -115,4 +113,60 @@ func Interval_backup(seconds int) {
 			log.Println("Data backed up successfully to Firestore")
 		}
 	}
+}
+
+func listenForWindowRequests(client *firestore.Client) {
+	ctx := context.Background()
+	collection := client.Collection("window_requests")
+
+	// Start listening for changes in the "window_requests" collection
+	snapshotIterator := collection.Snapshots(ctx)
+	defer snapshotIterator.Stop()
+
+	log.Println("Listening for window requests...")
+
+	for {
+		snapshot, err := snapshotIterator.Next()
+		if err != nil {
+			log.Println("Error listening to Firestore snapshots:", err)
+			continue
+		}
+
+		for _, change := range snapshot.Changes {
+			if change.Kind == firestore.DocumentAdded {
+				doc := change.Doc
+				userID := doc.Ref.ID // Document ID is the user ID
+				log.Printf("Received window toggle request from user: %s\n", userID)
+
+				// Toggle the window
+				if WindowOpen {
+					err = CloseWindow()
+				} else {
+					err = OpenWindow()
+				}
+
+				if err != nil {
+					log.Printf("Error toggling window for user %s: %v\n", userID, err)
+					continue
+				}
+
+				// Delete the document after processing
+				_, err = doc.Ref.Delete(ctx)
+				if err != nil {
+					log.Printf("Error deleting window request document for user %s: %v\n", userID, err)
+				}
+			}
+		}
+	}
+}
+
+func StartDBServices(seconds int) {
+	client := initFirebase()
+	defer client.Close()
+
+	// Start the interval backup in a goroutine
+	go intervalBackup(client, seconds)
+
+	// Start listening for window requests
+	listenForWindowRequests(client)
 }

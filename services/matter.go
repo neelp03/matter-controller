@@ -9,8 +9,8 @@ import (
 	"strings"
 )
 
-func IsDeviceCommissioned() bool {
-	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "operationalcredentials", "read", "fabrics", "1", "0")
+func IsDeviceCommissioned(endpoint int) bool {
+	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "operationalcredentials", "read", "fabrics", fmt.Sprintf("%d", endpoint), "0")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("!!!!!!!!!! Error checking commissioned status !!!!!!!!!!:", err)
@@ -21,15 +21,15 @@ func IsDeviceCommissioned() bool {
 	if strings.Contains(outStr, "Fabrics: 0 entries") {
 		return false
 	}
-	if strings.Contains(outStr, "Fabrics: 1 entries") && strings.Contains(outStr, "NodeID: 1") {
+	if strings.Contains(outStr, "Fabrics: 1 entries") {
 		return true
 	}
 	return false
 }
 
-func PairDeviceOverBLE(ssid, password string) error {
-	fmt.Println("========== Device not commissioned. Attempting to pair via BLE... ==========")
-	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "pairing", "ble-wifi", "1", ssid, password, "20202021", "3840")
+func PairDeviceOverBLE(endpoint int, ssid, password string) error {
+	fmt.Printf("========== Device %d not commissioned. Attempting to pair via BLE... ==========\n", endpoint)
+	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "pairing", "ble-wifi", fmt.Sprintf("%d", endpoint), ssid, password, "20202021", "3840")
 	cmdOut, err := cmd.CombinedOutput()
 	fmt.Println("========== Pairing output ==========")
 	fmt.Println(string(cmdOut))
@@ -62,4 +62,26 @@ func ReadTemperature() (float64, error) {
 	fahrenheit := utils.CToF(celsius)
 
 	return fahrenheit, nil
+}
+
+func OpenWindowMotor() error {
+	fmt.Println("========== Sending Matter command: OPEN window motor ==========")
+	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "onoff", "on", "3", "1")
+	cmdOut, err := cmd.CombinedOutput()
+	fmt.Println(string(cmdOut))
+	if err != nil {
+		return fmt.Errorf("!!!!!!!!!! Failed to open window motor !!!!!!!!!!: %v", err)
+	}
+	return nil
+}
+
+func CloseWindowMotor() error {
+	fmt.Println("========== Sending Matter command: CLOSE window motor ==========")
+	cmd := exec.Command("../connectedhomeip/out/host/chip-tool", "onoff", "off", "3", "1")
+	cmdOut, err := cmd.CombinedOutput()
+	fmt.Println(string(cmdOut))
+	if err != nil {
+		return fmt.Errorf("!!!!!!!!!! Failed to close window motor !!!!!!!!!!: %v", err)
+	}
+	return nil
 }
