@@ -13,6 +13,8 @@ func OpenWindow() error {
 	WindowMu.Lock()
 	defer WindowMu.Unlock()
 
+	SendNotification()
+
 	if WindowOpen {
 		fmt.Println("Window is already open")
 		return nil

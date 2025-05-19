@@ -8,12 +8,13 @@ import (
 
 	firestore "cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	messaging "firebase.google.com/go/messaging"
 	"github.com/joho/godotenv"
 	"github.com/neelp03/matter-controller/utils"
 	"google.golang.org/api/option"
 )
 
-func initFirebase() *firestore.Client {
+func InitFirebase() FirebaseClient {
 	// Load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
@@ -29,13 +30,30 @@ func initFirebase() *firestore.Client {
 		log.Fatalln(err)
 	}
 
-	client, err := app.Firestore(ctx)
+	firestore_client, err := app.Firestore(ctx)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return client
+	messaging_client, err := app.Messaging(ctx)
+	if err != nil {
+		log.Fatalf("error getting Messaging client: %v\n", err)
+	}
+
+	return FirebaseClient{
+		FirestoreClient: firestore_client,
+		MessagingClient: messaging_client,
+		ctx:             ctx,
+	}
 }
+
+type FirebaseClient struct {
+	FirestoreClient *firestore.Client
+	MessagingClient *messaging.Client
+	ctx             context.Context
+}
+
+var FirebaseClientInstance FirebaseClient = InitFirebase()
 
 func backupDataToFirestore(client *firestore.Client, data map[string]interface{}) {
 	ctx := context.Background()
@@ -161,7 +179,7 @@ func listenForWindowRequests(client *firestore.Client) {
 }
 
 func StartDBServices(seconds int) {
-	client := initFirebase()
+	client := FirebaseClientInstance.FirestoreClient
 	defer client.Close()
 
 	// Start the interval backup in a goroutine
@@ -169,4 +187,25 @@ func StartDBServices(seconds int) {
 
 	// Start listening for window requests
 	listenForWindowRequests(client)
+
+}
+
+func SendNotification() {
+	// Create a message to send
+	msg := &messaging.Message{
+		Topic: "window_events",
+		Notification: &messaging.Notification{
+			Title: "Window Opened",
+			Body:  "AmbiAir detected a window has been opened.",
+		},
+		Data: map[string]string{
+			"event": "window_opened",
+		},
+	}
+
+	res, err := FirebaseClientInstance.MessagingClient.Send(FirebaseClientInstance.ctx, msg)
+	if err != nil {
+		log.Fatalf("Error sending FCM message: %v", err)
+	}
+	log.Printf("Successfully sent topic message: %s", res)
 }
