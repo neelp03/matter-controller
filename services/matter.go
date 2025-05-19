@@ -34,7 +34,8 @@ func PairDeviceOverBLE(endpoint int, ssid, password string) error {
 	fmt.Println("========== Pairing output ==========")
 	fmt.Println(string(cmdOut))
 	if err != nil {
-		return fmt.Errorf("!!!!!!!!!! Pairing failed !!!!!!!!!!: %v", err)
+		fmt.Println("!!!!!!!!!! Pairing failed !!!!!!!!!!:", err)
+		return err
 	}
 	fmt.Println("++++++++++ Pairing succeeded ++++++++++")
 	return nil

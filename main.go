@@ -28,9 +28,10 @@ func main() {
 	} else {
 		if err := services.PairDeviceOverBLE(1, ssid, password); err != nil {
 			fmt.Println("!!!!!!!!!! Failed to pair temperature sensor !!!!!!!!!!:", err)
-			return
+			// return
+		} else {
+			fmt.Println("++++++++++ Paired temperature sensor ++++++++++")
 		}
-		fmt.Println("++++++++++ Paired temperature sensor ++++++++++")
 	}
 
 	// Check and pair Window Motor (endpoint 2)
@@ -39,9 +40,10 @@ func main() {
 	} else {
 		if err := services.PairDeviceOverBLE(3, ssid, password); err != nil {
 			fmt.Println("!!!!!!!!!! Failed to pair window motor !!!!!!!!!!:", err)
-			return
+			// return
+		} else {
+			fmt.Println("++++++++++ Paired window motor ++++++++++")
 		}
-		fmt.Println("++++++++++ Paired window motor ++++++++++")
 	}
 
 	// Start periodic data backup
